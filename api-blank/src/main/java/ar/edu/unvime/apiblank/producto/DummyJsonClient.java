@@ -11,9 +11,9 @@ public class DummyJsonClient {
 
     private final RestClient restClient;
 
-    // Spring nos inyecta automáticamente el 'RestClient.Builder'
-    public DummyJsonClient(RestClient.Builder builder) {
-        this.restClient = builder
+    // Usamos el builder nativo de RestClient sin requerir inyección externa
+    public DummyJsonClient() {
+        this.restClient = RestClient.builder()
             .baseUrl("https://dummyjson.com")
             .build();
     }
