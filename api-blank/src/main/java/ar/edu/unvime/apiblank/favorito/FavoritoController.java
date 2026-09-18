@@ -2,6 +2,7 @@ package ar.edu.unvime.apiblank.favorito;
 
 import java.net.URI;
 import java.util.List;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,7 +41,7 @@ public class FavoritoController {
 
     // POST /api/favoritos -> 201 Created (con header Location)
     @PostMapping
-    public ResponseEntity<FavoritoResponse> crear(@RequestBody CrearFavoritoRequest request) {
+    public ResponseEntity<FavoritoResponse> crear(@Valid @RequestBody CrearFavoritoRequest request) {
         FavoritoResponse creado = service.crear(request);
         return ResponseEntity
             .created(URI.create("/api/favoritos/" + creado.id()))
@@ -49,7 +50,7 @@ public class FavoritoController {
 
     // PUT /api/favoritos/{id} -> 200 OK
     @PutMapping("/{id}")
-    public FavoritoResponse actualizar(@PathVariable Long id, @RequestBody CrearFavoritoRequest request) {
+    public FavoritoResponse actualizar(@PathVariable Long id, @Valid @RequestBody CrearFavoritoRequest request) {
         return service.actualizar(id, request);
     }
 
