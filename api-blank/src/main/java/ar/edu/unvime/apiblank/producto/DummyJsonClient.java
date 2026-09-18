@@ -1,7 +1,10 @@
 package ar.edu.unvime.apiblank.producto;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
+import ar.edu.unvime.apiblank.error.RecursoNoEncontradoException;
+import ar.edu.unvime.apiblank.error.ServicioExternoException;
 
 /**
  * Cliente HTTP encargado exclusivamente de comunicarse con la API externa DummyJSON.
@@ -23,10 +26,14 @@ public class DummyJsonClient {
      * y mapea la respuesta a nuestro objeto DummyJsonResponse.
      */
     public DummyJsonResponse obtenerTodos() {
-        return restClient.get()
-            .uri("/products")
-            .retrieve()
-            .body(DummyJsonResponse.class);
+        try {
+            return restClient.get()
+                .uri("/products")
+                .retrieve()
+                .body(DummyJsonResponse.class);
+        } catch (Exception e) {
+            throw new ServicioExternoException("No se pudo contactar a DummyJSON", e);
+        }
     }
 
     /**
@@ -34,9 +41,15 @@ public class DummyJsonClient {
      * y mapea el producto obtenido a nuestro objeto ProductoExterno.
      */
     public ProductoExterno obtenerPorId(Long id) {
-        return restClient.get()
-            .uri("/products/{id}", id)
-            .retrieve()
-            .body(ProductoExterno.class);
+        try {
+            return restClient.get()
+                .uri("/products/{id}", id)
+                .retrieve()
+                .body(ProductoExterno.class);
+        } catch (HttpClientErrorException.NotFound e) {
+            throw new RecursoNoEncontradoException("No existe el producto con id " + id);
+        } catch (Exception e) {
+            throw new ServicioExternoException("No se pudo contactar a DummyJSON", e);
+        }
     }
 }
