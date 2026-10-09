@@ -75,4 +75,17 @@ public class FavoritoRepositoryAdapter implements FavoritoRepository {
     public void eliminar(Long id) {
         jpaRepository.deleteById(id);
     }
+
+    @Override
+    public List<Favorito> buscarPorListaId(Long listaId) {
+        return jpaRepository.findByListaId(listaId).stream()
+            .map(entity -> new Favorito(
+                entity.getId(),
+                entity.getProductoId(),
+                entity.getNota(),
+                entity.getFechaAlta(),
+                entity.getLista() != null ? entity.getLista().getId() : null
+            ))
+            .toList();
+    }
 }

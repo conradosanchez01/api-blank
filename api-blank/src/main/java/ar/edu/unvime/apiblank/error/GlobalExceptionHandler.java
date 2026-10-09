@@ -39,4 +39,11 @@ public class GlobalExceptionHandler {
     public ApiError manejarServicioExterno(ServicioExternoException ex) {
         return new ApiError(502, ex.getMessage(), Map.of());
     }
+
+    // Caso 4: 409 Conflict (ej. intentar borrar lista con elementos)
+    @ExceptionHandler(ConflictoEstadoException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError manejarConflictoEstado(ConflictoEstadoException ex) {
+        return new ApiError(409, ex.getMessage(), Map.of());
+    }
 }

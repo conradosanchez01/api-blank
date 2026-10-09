@@ -23,6 +23,12 @@ public class FavoritoService {
             .toList();
     }
 
+    public List<FavoritoResponse> buscarPorLista(Long listaId) {
+        return repository.buscarPorListaId(listaId).stream()
+            .map(this::aResponse)
+            .toList();
+    }
+
     public FavoritoResponse buscarPorId(Long id) {
         return repository.buscarPorId(id)
             .map(this::aResponse)

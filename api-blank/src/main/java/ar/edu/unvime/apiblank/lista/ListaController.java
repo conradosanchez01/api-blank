@@ -1,5 +1,6 @@
 package ar.edu.unvime.apiblank.lista;
 
+import ar.edu.unvime.apiblank.favorito.FavoritoResponse;
 import java.net.URI;
 import java.util.List;
 import jakarta.validation.Valid;
@@ -40,5 +41,10 @@ public class ListaController {
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         service.eliminar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/favoritos")
+    public List<FavoritoResponse> obtenerFavoritos(@PathVariable Long id) {
+        return service.obtenerFavoritos(id);
     }
 }
