@@ -3,6 +3,8 @@ package ar.edu.unvime.apiblank.favorito;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import ar.edu.unvime.apiblank.lista.ListaEntity;
+
 @Entity
 @Table(name = "favoritos")
 public class FavoritoEntity {
@@ -21,15 +23,20 @@ public class FavoritoEntity {
     @Column(name = "fecha_alta", nullable = false)
     private LocalDateTime fechaAlta;
 
+    @ManyToOne
+    @JoinColumn(name = "lista_id")
+    private ListaEntity lista;
+
     // Constructor vacío obligatorio para que JPA funcione
     public FavoritoEntity() {}
 
     // Constructor completo 
-    public FavoritoEntity(Long id, Long productoId, String nota, LocalDateTime fechaAlta) {
+    public FavoritoEntity(Long id, Long productoId, String nota, LocalDateTime fechaAlta, ListaEntity lista) {
         this.id = id;
         this.productoId = productoId;
         this.nota = nota;
         this.fechaAlta = fechaAlta;
+        this.lista = lista;
     }
 
     // Getters y Setters
@@ -44,4 +51,7 @@ public class FavoritoEntity {
 
     public LocalDateTime getFechaAlta() { return fechaAlta; }
     public void setFechaAlta(LocalDateTime fechaAlta) { this.fechaAlta = fechaAlta; }
+
+    public ListaEntity getLista() { return lista; }
+    public void setLista(ListaEntity lista) { this.lista = lista; }
 }

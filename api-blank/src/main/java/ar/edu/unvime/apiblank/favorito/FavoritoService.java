@@ -34,7 +34,8 @@ public class FavoritoService {
             null, // El ID se genera en el repositorio
             request.productoId(),
             request.nota(),
-            LocalDateTime.now() // Fecha automática de creación
+            LocalDateTime.now(), // Fecha automática de creación
+            request.listaId()
         );
         return aResponse(repository.guardar(nuevo));
     }
@@ -48,7 +49,8 @@ public class FavoritoService {
             id,
             request.productoId(),
             request.nota(),
-            existente.fechaAgregado() // Mantenemos la fecha original en que se agregó
+            existente.fechaAgregado(), // Mantenemos la fecha original en que se agregó
+            request.listaId()
         );
         return aResponse(repository.guardar(actualizado));
     }
@@ -66,7 +68,8 @@ public class FavoritoService {
             favorito.id(),
             favorito.productoId(),
             favorito.nota(),
-            favorito.fechaAgregado()
+            favorito.fechaAgregado(),
+            favorito.listaId()
         );
     }
 }

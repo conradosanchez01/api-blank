@@ -1,6 +1,7 @@
 package ar.edu.unvime.apiblank.favorito;
 
 import org.springframework.stereotype.Component;
+import ar.edu.unvime.apiblank.lista.ListaEntity;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +23,8 @@ public class FavoritoRepositoryAdapter implements FavoritoRepository {
                 entity.getId(),
                 entity.getProductoId(),
                 entity.getNota(),
-                entity.getFechaAlta()
+                entity.getFechaAlta(),
+                entity.getLista() != null ? entity.getLista().getId() : null
             ))
             .toList();
     }
@@ -34,18 +36,26 @@ public class FavoritoRepositoryAdapter implements FavoritoRepository {
                 entity.getId(),
                 entity.getProductoId(),
                 entity.getNota(),
-                entity.getFechaAlta()
+                entity.getFechaAlta(),
+                entity.getLista() != null ? entity.getLista().getId() : null
             ));
     }
 
     @Override
     public Favorito guardar(Favorito favorito) {
+        ListaEntity listaRef = null;
+        if (favorito.listaId() != null) {
+            listaRef = new ListaEntity();
+            listaRef.setId(favorito.listaId());
+        }
+
         // 1. Traducimos el Record (Dominio) a la Entity (Base de datos)
         FavoritoEntity entity = new FavoritoEntity(
             favorito.id(),
             favorito.productoId(),
             favorito.nota(),
-            favorito.fechaAgregado() // Ojo: en nuestro record se llama fechaAgregado, en BD fechaAlta
+            favorito.fechaAgregado(),
+            listaRef
         );
 
         // 2. Guardamos en BD. Nos devuelve el objeto con el ID que se autogeneró.
@@ -56,7 +66,8 @@ public class FavoritoRepositoryAdapter implements FavoritoRepository {
             guardado.getId(),
             guardado.getProductoId(),
             guardado.getNota(),
-            guardado.getFechaAlta()
+            guardado.getFechaAlta(),
+            guardado.getLista() != null ? guardado.getLista().getId() : null
         );
     }
 

@@ -12,5 +12,8 @@ public record CrearFavoritoRequest(
     Long productoId,
 
     @NotBlank(message = "nota no puede estar vacía")
-    String nota
+    String nota,
+
+    @NotNull(message = "listaId es obligatorio")
+    Long listaId
 ) {}
