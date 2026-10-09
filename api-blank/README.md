@@ -151,3 +151,10 @@ src/main/java/ar/edu/unvime/apiblank/
     ├── FavoritoService.java            # Lógica de negocio y mapeo
     └── FavoritoController.java         # Endpoints CRUD /api/favoritos
 ```
+
+## TP2 - Persistencia y Puertos y Adaptadores (Arquitectura Hexagonal)
+Al migrar el sistema de almacenamiento de Memoria a PostgreSQL (JPA), el impacto en el código fue el siguiente:
+
+* **Lo que cambió (Capa de Infraestructura):** Creamos un nuevo adaptador (`FavoritoRepositoryAdapter`) junto con `FavoritoEntity` y eliminamos el antiguo repositorio en memoria (`FavoritoRepositoryMemoria`).
+* **Lo que NO cambió (Capa de Dominio/Aplicación):** Las clases `FavoritoController`, `FavoritoService`, los DTOs y el record de dominio `Favorito` quedaron intactos.
+* **¿Por qué fue posible?** Gracias a que `FavoritoRepository` funciona como un **Puerto** (un contrato puro). Al Service no le interesa qué motor de base de datos hay por detrás, solo espera que alguien cumpla ese contrato. Así, pudimos intercambiar la implementación de memoria RAM por la de PostgreSQL de forma transparente, sin afectar ni acoplar la lógica de negocio.
