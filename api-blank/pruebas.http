@@ -90,3 +90,99 @@ DELETE {{baseUrl}}/api/favoritos/1
 
 ### 2.9 Favoritos - Comprobación de eliminación: Buscar el ID eliminado (404 Not Found)
 GET {{baseUrl}}/api/favoritos/1
+
+
+
+
+### ---------------------------------------------------------------------------
+### RECURSO 3: LISTAS (TP2 - Persistencia y Transacciones)
+### ---------------------------------------------------------------------------
+
+### 3.1 Listas : Listar todas las listas (200 OK) - Caso de ÉXITO
+GET {{baseUrl}}/api/listas
+
+###
+
+### 3.2 Listas . Crear una nueva lista "Setup Gamer" (201 Created)- Caso de ÉXITO: 
+POST {{baseUrl}}/api/listas
+Content-Type: application/json
+
+{
+  "nombre": "Setup Gamer"
+}
+
+###
+
+### 3.3 Listas : Crear un favorito apuntando a una lista existente. - Caso de ÉXITO
+# (Nota: Asumimos que vas a usar el ID de la lista "Mis Favoritos" (3) o la que hayas creado)
+POST {{baseUrl}}/api/favoritos
+Content-Type: application/json
+
+{
+  "productoId": 10,
+  "nota": "Monitor 144hz",
+  "listaId": 3
+}
+
+###
+
+### 3.4 Listas - Caso de ERROR: Mover a una lista que no existe (404 Not Found)
+POST {{baseUrl}}/api/listas/4/mover-favoritos
+Content-Type: application/json
+
+{
+  "destinoId": 999
+}
+
+###
+
+### 3.5 Listas - Caso de ÉXITO (PUNTO 7): Mover favoritos de Lista 3 a Lista 1 (200 OK)
+# IMPORTANTE: Este endpoint mueve todo el contenido de la Lista 3 hacia la Lista 1,
+# y luego ELIMINA la lista 3 automáticamente (Operación Transaccional).
+POST {{baseUrl}}/api/listas/3/mover-favoritos
+Content-Type: application/json
+
+{
+  "destinoId": 1
+}
+
+###
+
+### 3.6 Listas  Comprobar que la Lista 3 ya no existe (404 Not Found) - Caso de ÉXITO:
+GET {{baseUrl}}/api/listas/3
+
+###
+
+
+
+
+### 3.7 Listas  Comprobar que los favoritos llegaron a la Lista 1 (200 OK)- Caso de ÉXITO:
+GET {{baseUrl}}/api/listas/1/favoritos
+
+
+
+
+### ---------------------------------------------------------------------------
+###  Pedir / Eliminar / Editar Favoritos Individuales
+### ---------------------------------------------------------------------------
+
+
+GET {{baseUrl}}/api/favoritos
+
+### Eliminar un favorito específico (cambiá el número del final por el ID que quieras borrar)
+# Recordá que devuelve 204 No Content si se borró con éxito
+DELETE {{baseUrl}}/api/favoritos/1
+###
+
+### Modificar un favorito específico (ejemplo con ID 1)
+# IMPORTANTE: Tenés que mandarle el productoId, la nota y el listaId.
+PUT {{baseUrl}}/api/favoritos/1
+Content-Type: application/json
+
+{
+  "productoId": 1,
+  "nota": "microfono",
+  "listaId": 1
+}
+
+###

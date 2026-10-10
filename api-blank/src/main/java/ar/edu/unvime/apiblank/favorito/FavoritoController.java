@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/favoritos")
-@Tag(name = "favoritos", description = "CRUD de favoritos en memoria")
+@Tag(name = "favoritos", description = "CRUD de favoritos en PostgreSQL")
 public class FavoritoController {
 
     private final FavoritoService service;
@@ -30,23 +30,29 @@ public class FavoritoController {
         this.service = service;
     }
 
-    // GET /api/favoritos -> 200 OK
     @GetMapping
     @Operation(summary = "Listar todos los favoritos")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Lista de favoritos obtenida exitosamente")
     public List<FavoritoResponse> listar() {
         return service.listar();
     }
 
-    // GET /api/favoritos/{id} -> 200 OK
     @GetMapping("/{id}")
     @Operation(summary = "Buscar un favorito por su ID")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Favorito encontrado"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "El favorito no existe")
+    })
     public FavoritoResponse buscarPorId(@PathVariable Long id) {
         return service.buscarPorId(id);
     }
 
-    // POST /api/favoritos -> 201 Created (con header Location)
     @PostMapping
     @Operation(summary = "Crear un nuevo favorito")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Favorito creado exitosamente"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Datos de entrada inválidos o faltantes")
+    })
     public ResponseEntity<FavoritoResponse> crear(@Valid @RequestBody CrearFavoritoRequest request) {
         FavoritoResponse creado = service.crear(request);
         return ResponseEntity
@@ -54,16 +60,23 @@ public class FavoritoController {
             .body(creado);
     }
 
-    // PUT /api/favoritos/{id} -> 200 OK
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar un favorito existente")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Favorito actualizado exitosamente"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Datos de entrada inválidos"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "El favorito no existe")
+    })
     public FavoritoResponse actualizar(@PathVariable Long id, @Valid @RequestBody CrearFavoritoRequest request) {
         return service.actualizar(id, request);
     }
 
-    // DELETE /api/favoritos/{id} -> 204 No Content
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar un favorito por su ID")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "204", description = "Favorito eliminado correctamente (no retorna contenido)"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "El favorito no existe")
+    })
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         service.eliminar(id);
         return ResponseEntity.noContent().build();

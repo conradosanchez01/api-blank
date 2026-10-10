@@ -2,10 +2,12 @@ package ar.edu.unvime.apiblank.lista;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ar.edu.unvime.apiblank.error.RecursoNoEncontradoException;
 import ar.edu.unvime.apiblank.error.ConflictoEstadoException;
 import ar.edu.unvime.apiblank.favorito.FavoritoService;
 import ar.edu.unvime.apiblank.favorito.FavoritoResponse;
+import ar.edu.unvime.apiblank.favorito.CrearFavoritoRequest;
 
 @Service
 public class ListaService {
@@ -53,5 +55,30 @@ public class ListaService {
         // Validamos que exista la lista primero
         buscarPorId(id);
         return favoritoService.buscarPorLista(id);
+    }
+
+    @Transactional
+    public void moverFavoritos(Long origenId, MoverFavoritosRequest request) {
+        Long destinoId = request.destinoId();
+
+        // 1. Validamos que ambas listas existan (tira 404 si no)
+        buscarPorId(origenId);
+        buscarPorId(destinoId);
+
+        // 2. Buscamos los favoritos de la lista original
+        List<FavoritoResponse> favoritos = favoritoService.buscarPorLista(origenId);
+
+        // 3. Reasignamos uno por uno a la lista destino
+        for (FavoritoResponse f : favoritos) {
+            CrearFavoritoRequest updateReq = new CrearFavoritoRequest(
+                f.productoId(), 
+                f.nota(), 
+                destinoId
+            );
+            favoritoService.actualizar(f.id(), updateReq);
+        }
+
+        // 4. Eliminamos la lista original (ahora sí está vacía, pasa la validación 409)
+        eliminar(origenId);
     }
 }
