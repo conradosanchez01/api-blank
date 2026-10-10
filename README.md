@@ -151,3 +151,33 @@ src/main/java/ar/edu/unvime/apiblank/
     ├── FavoritoService.java            # Lógica de negocio y mapeo
     └── FavoritoController.java         # Endpoints CRUD /api/favoritos
 ```
+
+## TP2 - Persistencia y Puertos y Adaptadores (Arquitectura Hexagonal)
+Al migrar el sistema de almacenamiento de Memoria a PostgreSQL (JPA), el impacto en el código fue el siguiente:
+
+* **Lo que cambió (Capa de Infraestructura):** Creamos un nuevo adaptador (`FavoritoRepositoryAdapter`) junto con `FavoritoEntity` y eliminamos el antiguo repositorio en memoria (`FavoritoRepositoryMemoria`).
+* **Lo que NO cambió (Capa de Dominio/Aplicación):** Las clases `FavoritoController`, `FavoritoService`, los DTOs y el record de dominio `Favorito` quedaron intactos.
+* **¿Por qué fue posible?** Gracias a que `FavoritoRepository` funciona como un **Puerto** (un contrato puro). Al Service no le interesa qué motor de base de datos hay por detrás, solo espera que alguien cumpla ese contrato. Así, pudimos intercambiar la implementación de memoria RAM por la de PostgreSQL de forma transparente, sin afectar ni acoplar la lógica de negocio.
+
+## Configuración de Base de Datos (TP2)
+
+Para ejecutar esta versión de la API que incluye persistencia real, necesitás tener un motor de PostgreSQL corriendo localmente.
+
+1. Instalar PostgreSQL (versión 14 o superior recomendada).
+2. Crear una base de datos llamada `apiblank` (o usar las credenciales configuradas en tu `application.properties`).
+3. Configuración de credenciales:
+   Por defecto, el proyecto (en su archivo `application.properties`) está configurado para conectarse con:
+   - **Usuario:** `postgres`
+   - **Contraseña:** `1234`
+   - **Puerto:** `5432`
+   *(Si tu servidor local usa otra contraseña o usuario, recordá modificarlos en el archivo `src/main/resources/application.properties` antes de ejecutar).*
+4. Al arrancar la aplicación (`.\mvnw.cmd spring-boot:run`), **Flyway** se encargará automáticamente de ejecutar las migraciones SQL (V1 a V4) y crear las tablas `listas` y `favoritos`.
+5. Podés usar herramientas como **pgAdmin 4** o **DBeaver** conectándote a `localhost:5432` para visualizar las tablas creadas y los datos guardados.
+
+## Justificaciones Teóricas (Evidencia TP2)
+
+### Punto 6: Evolución del esquema
+La migración para hacer obligatoria la columna `lista_id` se resolvió creando un nuevo script (`V4__lista_id_obligatorio.sql`) en lugar de modificar las migraciones anteriores (V2 o V3). Esto se debe a que herramientas como Flyway calculan un checksum de cada archivo aplicado; si modificamos un archivo del pasado, el checksum cambia y Flyway rechaza arrancar la aplicación por inconsistencia. Las bases de datos se evolucionan siempre "hacia adelante" mediante nuevos scripts.
+
+### Punto 7: Transacciones (ACID)
+En la operación de mover favoritos entre listas, utilizamos la anotación `@Transactional` en la capa de servicios. Si no la usáramos y ocurriera un fallo (por ejemplo, se corta la base de datos o hay un error de red) justo después de reasignar los favoritos pero antes de borrar la lista origen, la base de datos quedaría en un estado inconsistente (una lista origen vacía que nunca se borró, o favoritos duplicados/huérfanos). Gracias a la propiedad de **Atomicidad** (la 'A' de ACID), `@Transactional` garantiza que ambas escrituras sean un paquete indivisible: o se aplican todas con éxito, o se hace un *Rollback* automático y la base de datos vuelve a su estado original sin cambios a medias.
